@@ -1,7 +1,10 @@
-**/__pycache
+**/__pycache__
 .vscode
 .cache
 log.log
 
 # Came with the library as an example program, used it for API reference
 simple-program.py 
+
+tmp
+screencap.png

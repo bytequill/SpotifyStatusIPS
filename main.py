@@ -1,4 +1,6 @@
-from library.lcd.lcd_comm_rev_a import LcdCommRevA, Orientation
+from library.lcd.lcd_comm_rev_a import LcdCommRevA
+from library.lcd.lcd_simulated import LcdSimulated
+from library.lcd.lcd_comm import LcdComm, Orientation
 from PIL import Image
 from time import sleep
 from spotify_auth import HandleAuth
@@ -10,6 +12,7 @@ import io
 import urllib.request as urllib
 
 COM_PORT = "AUTO"
+COM_REV = LcdCommRevA
 WIDTH, HEIGHT = 480, 320
 BRIGHTNESS = 45
 BGCOL = (50, 50, 50)
@@ -22,7 +25,7 @@ RUN = True
 SP: spotipy.Spotify
 
 class App:
-    def __init__(self, comm: LcdCommRevA) -> None:
+    def __init__(self, comm: LcdComm) -> None:
         self.comm = comm
         self.sp: spotipy.Spotify = None
         self.lock = GLOBAL_LOCK
@@ -57,7 +60,7 @@ class App:
             if playback["currently_playing_type"] != "track": 
                 print(f"[WARN] This playback type has not been implemented: {playback["currently_playing_type"]}");return
         except TypeError: pass
-        def screenOFFProcedure(self):
+        def screenOFFProcedure(self: App):
             if self.isSong: self.isSong = False
             self.current_id = ""
             self.lock.acquire()
@@ -100,7 +103,7 @@ class App:
         i = 0
         while RUN:
             if i % CHECK_EVERY == 0:
-                threading.Thread(target=self._checkForNewSong).start() #Runs asynchronously to not disrupt the play bar with internet requests
+                threading.Thread(target=self._checkForNewSong).start() # Runs asynchronously to not disrupt the play bar with internet requests
             i += 1
             if self.isSong:
                 self.lock.acquire()
@@ -187,10 +190,14 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, stopall)
     signal.signal(signal.SIGINT, stopall)
     
-    lcd_comm = LcdCommRevA(com_port=COM_PORT, display_width=WIDTH, display_height=HEIGHT)
+    if type(COM_REV) == LcdCommRevA:
+        lcd_comm = COM_REV(com_port=COM_PORT, display_width=WIDTH, display_height=HEIGHT)
+    else:
+        lcd_comm = COM_REV(com_port=COM_PORT, display_width=HEIGHT, display_height=WIDTH)
     lcd_comm.Reset()
     lcd_comm.InitializeComm()
     lcd_comm.SetBrightness(level=BRIGHTNESS)
+
     #lcd_comm.Clear() # This is not actually needed since we restart and use ClearWithBG. Just takes up time on init
     lcd_comm.SetOrientation(orientation=Orientation.LANDSCAPE)
     lcd_comm.ScreenOn()
@@ -208,3 +215,5 @@ if __name__ == "__main__":
         pass
 
     lcd_comm.closeSerial()
+
+# TODO: add .env configuration

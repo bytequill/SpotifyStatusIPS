@@ -6,6 +6,8 @@ import multiprocessing
 import os
 import webbrowser
 
+# If you want you can replace this with your own key
+# This key is in development mode, so you might need to add your own
 SPOTIPY_CLIENT_ID = '67027e84d73c49aca8f3f03fe3c8c441'
 SPOTIPY_CLIENT_SECRET = '133be535ea0b468db46122056dd23ba4'
 REDIRECT_URI = 'http://localhost:9099/getToken'
