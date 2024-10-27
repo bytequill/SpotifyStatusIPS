@@ -1,26 +1,72 @@
 from library.lcd.lcd_comm_rev_a import LcdCommRevA
+from library.lcd.lcd_comm_rev_b import LcdCommRevB
+from library.lcd.lcd_comm_rev_c import LcdCommRevC
+from library.lcd.lcd_comm_rev_d import LcdCommRevD
 from library.lcd.lcd_simulated import LcdSimulated
 from library.lcd.lcd_comm import LcdComm, Orientation
 from PIL import Image
 from time import sleep
-from spotify_auth import HandleAuth
 import spotipy
+from spotipy.oauth2 import SpotifyPKCE
 import datetime
 import threading
 import signal
-import io
+import io, os, os.path
 import urllib.request as urllib
+import dotenv
 
-COM_PORT = "AUTO"
-COM_REV = LcdCommRevA
-WIDTH, HEIGHT = 480, 320
-BRIGHTNESS = 45
-BGCOL = (50, 50, 50)
-CHECK_EVERY = 4 # in seconds
+if os.path.exists(".env"):
+    dotenv.load_dotenv()
+elif os.path.exists(".env.example"):
+    dotenv.load_dotenv(dotenv_path=".env.example")
+else:
+    print("[warn] No .env or .env.example file found. Make sure to pass in correct configuration in your environment")
 
+try:
+    try: # > If not set at all, defaults to AUTO
+        COM_PORT = os.getenv("COM_PORT")
+    except Exception:
+        COM_PORT = "AUTO"
+    revint = os.getenv("COM_REV")
+    if revint.upper() == "A":
+        COM_REV = LcdCommRevA
+    elif revint.upper() == "B":
+        COM_REV = LcdCommRevB
+    elif revint.upper() == "C":
+        COM_REV = LcdCommRevC
+    elif revint.upper() == "D":
+        COM_REV = LcdCommRevD
+    elif revint.upper() == "S":
+        COM_REV = LcdSimulated
+    else:
+        print("[error] Please specify a valid revision")
+        exit(1)
+
+    WIDTH, HEIGHT = int(os.getenv("DISPLAY_WIDTH")), int(os.getenv("DISPLAY_HEIGHT"))
+    BRIGHTNESS = int(os.getenv("DISPLAY_BRIGHTNESS"))
+    if BRIGHTNESS < 0 or BRIGHTNESS > 100:
+        print("[error] Brightness is a percentage value (i.e 0-100)")
+        exit(1)
+    BGCOL = (int(os.getenv("BGCOL_R")), int(os.getenv("BGCOL_G")), int(os.getenv("BGCOL_B")))
+    for col in BGCOL:
+        if col < 0 or col > 255:
+            print("[error] BGCOL values must be in range 0-255")
+            exit(1)
+    CHECK_EVERY = int(os.getenv("CHECK_EVERY"))
+    if os.getenv("SPOTIPY_CLIENT_ID") == "ENTER_OWN_HERE":
+        print("[error] You must create and specify a spotify client id. If not sure follow install steps in README.md")
+        exit(1)
+except KeyError or TypeError as e:
+    print(f"[error] An error occured during setting of configuration\n{e}")
+    exit(1)
 
 ## DO NOT TOUCH, NOT CONFIGURATION ##
 GLOBAL_LOCK = threading.Lock()
+OAUTH2_SCOPES = (
+    'user-modify-playback-state', 
+    'user-read-currently-playing', 
+    'user-read-playback-state'
+)
 RUN = True
 SP: spotipy.Spotify
 
@@ -76,7 +122,12 @@ class App:
             screenOFFProcedure(self)
             return
         if playback["is_playing"]:
-            if not self.isScreen: self.comm.ScreenOn(); self.isScreen = True; print("Turning screen ON")
+            if not self.isScreen: 
+                self.lock.acquire()
+                self.comm.ScreenOn()
+                self.lock.release()
+                self.isScreen = True
+                print("Turning screen ON")
             if not self.isSong: self.isSong = True
             id = playback["item"]["id"]
             self.time_done = seconds_to_time(int(playback["progress_ms"]/1000))
@@ -158,7 +209,7 @@ f'''New song detected:
         logo = Image.open("res/imgs/spoti-logo.png")
         logo.thumbnail((219,219))
         self.lock.acquire()
-        self.comm.DisplayText("Please authorize this application to access your spotify data\nThere should be a new tab in your default browser\nIf that didnt happen, go to: \nhttp://localhost:9099/", x=2, y=219+5,
+        self.comm.DisplayText("Please authorize this application to access your spotify data\nThere should be a new tab in your default browser", x=2, y=219+5,
                                 font="Roboto-Italic.ttf",
                                 font_size=18,
                                 font_color=(255, 255, 255),
@@ -182,6 +233,13 @@ def seconds_to_time(seconds):
 
 def time_to_seconds(time_obj: datetime.time) -> int:
     return time_obj.hour * 3600 + time_obj.minute * 60 + time_obj.second
+
+def HandleAuth() -> spotipy.Spotify:
+    # BRUH, I implemented a whole flask web server and it just had this builtin
+    sp = spotipy.Spotify(oauth_manager=SpotifyPKCE(scope=OAUTH2_SCOPES))
+    oauth: SpotifyPKCE = sp.oauth_manager
+    oauth.get_access_token()
+    return sp
 
 if __name__ == "__main__":
     def stopall(signum, frame):
@@ -215,5 +273,3 @@ if __name__ == "__main__":
         pass
 
     lcd_comm.closeSerial()
-
-# TODO: add .env configuration

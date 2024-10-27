@@ -10,4 +10,5 @@ pywin32==306
 PyYAML==6.0.2
 spotipy==2.24.0
 uptime==3.0.1
-flask == 3.0.3
+flask==3.0.3
+python-dotenv == 1.0.1

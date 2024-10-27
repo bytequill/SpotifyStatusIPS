@@ -3,6 +3,8 @@
 .cache
 log.log
 
+.env
+
 # Came with the library as an example program, used it for API reference
 simple-program.py 
 
