@@ -8,6 +8,6 @@ if (-not (Test-Path -Path ".\pythonportable")) {
 Write-Output 'Starting installation of necessary libraries' 
 &".\pythonportable\python.exe" "-m" "pip" "install" "-U" "pip" "setuptools" "wheel" "numpy"
 &".\pythonportable\python.exe" "-m" "pip" "install" "-r" "requirements.txt"
-Copy-Item -Path ".\library" -Destination ".\pythonportable\Lib\site-packages\library"
+Copy-Item -Path ".\library" -Destination ".\pythonportable\Lib\site-packages\library" -Recurse
 Write-Output 'Local environment installed. To run the project please open nopython-run.bat'
 Pause
