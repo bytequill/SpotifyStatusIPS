@@ -108,7 +108,7 @@ class App:
         #print(f"PLAYBACK IS: {playback}\n===============")
         try: 
             if playback["currently_playing_type"] != "track": 
-                print(f"[WARN] This playback type has not been implemented: {playback["currently_playing_type"]}");return
+                print(f"[WARN] This playback type has not been implemented: {playback['currently_playing_type']}");return
         except TypeError: pass
         def screenOFFProcedure(self: App):
             if self.isSong: self.isSong = False
