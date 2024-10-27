@@ -6,6 +6,8 @@ if (-not (Test-Path -Path ".\pythonportable")) {
     &".\pythonportable\python.exe" ".\pythonportable\get-pip.py"
 }
 Write-Output 'Starting installation of necessary libraries' 
+&".\pythonportable\python.exe" "-m" "pip" "install" "-U" "pip"
+&".\pythonportable\Scripts\pip.exe" "install" "setuptools"
 &".\pythonportable\Scripts\pip.exe" "install" "-r" "requirements.txt"
 Write-Output 'Local environment installed. To run the project please open nopython-run.bat'
 Pause

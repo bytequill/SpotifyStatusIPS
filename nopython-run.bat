@@ -1,3 +1,3 @@
 @echo off
 
-.\portablepython\python.exe main.py
+.\pythonportable\python.exe main.py
