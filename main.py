@@ -1,19 +1,23 @@
-from library.lcd.lcd_comm_rev_a import LcdCommRevA
-from library.lcd.lcd_comm_rev_b import LcdCommRevB
-from library.lcd.lcd_comm_rev_c import LcdCommRevC
-from library.lcd.lcd_comm_rev_d import LcdCommRevD
-from library.lcd.lcd_simulated import LcdSimulated
-from library.lcd.lcd_comm import LcdComm, Orientation
-from PIL import Image
-from time import sleep
-import spotipy
-from spotipy.oauth2 import SpotifyPKCE
-import datetime
-import threading
-import signal
-import io, os, os.path
-import urllib.request as urllib
-import dotenv
+try:
+    from library.lcd.lcd_comm_rev_a import LcdCommRevA
+    from library.lcd.lcd_comm_rev_b import LcdCommRevB
+    from library.lcd.lcd_comm_rev_c import LcdCommRevC
+    from library.lcd.lcd_comm_rev_d import LcdCommRevD
+    from library.lcd.lcd_simulated import LcdSimulated
+    from library.lcd.lcd_comm import LcdComm, Orientation
+    from PIL import Image
+    from time import sleep
+    import spotipy
+    from spotipy.oauth2 import SpotifyPKCE
+    import datetime
+    import threading
+    import signal
+    import io, os, os.path
+    import urllib.request as urllib
+    import dotenv
+except ImportError as e:
+    print(f"[error] Could not find one of the requested imports\nCheck the installation steps in README.md if you haven't already\n{e}")
+    exit(1)
 
 if os.path.exists(".env"):
     dotenv.load_dotenv()
