@@ -193,7 +193,7 @@ f'''New song detected:
                          font_color=(255, 255, 255),
                          background_color=BGCOL,
                          align='left')
-        self.comm.DisplayText(f"By {songinfo["artists"]}", x=2, y=222 + 24 + 3,
+        self.comm.DisplayText(f"By {songinfo['artists']}", x=2, y=222 + 24 + 3,
                          font="Roboto-Italic.ttf",
                          font_size=20,
                          font_color=(255, 255, 255),
