@@ -112,17 +112,21 @@ class App:
         except TypeError: pass
         def screenOFFProcedure(self: App):
             if self.isSong: self.isSong = False
+            if self.isScreen:
+                self.isScreen = False
+            else:
+                self.sp.me() # Tries to keep the auth working if idle for too long - Not tested yet
+                return
             self.current_id = ""
             self.lock.acquire()
             self.comm.ScreenOff()
-            self.isScreen = False
             self.lock.release()
             print("Turning screen OFF")
             self.ClearWithBG()
         try:
             if not playback["is_playing"] and self.isScreen:
                 screenOFFProcedure(self)
-        except TypeError: # Happens when it initialises without a song playing
+        except TypeError: # Happens when it initialises without a song playing and after a while without playback
             screenOFFProcedure(self)
             return
         if playback["is_playing"]:
@@ -262,11 +266,11 @@ if __name__ == "__main__":
 
     #lcd_comm.Clear() # This is not actually needed since we restart and use ClearWithBG. Just takes up time on init
     lcd_comm.SetOrientation(orientation=Orientation.LANDSCAPE)
-    lcd_comm.ScreenOn()
 
     app = App(lcd_comm)
 
     app.ClearWithBG()
+    lcd_comm.ScreenOn()
     app.drawLoginPage()
     SP = HandleAuth()
     app.sp = SP
