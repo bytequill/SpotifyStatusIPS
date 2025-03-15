@@ -153,10 +153,10 @@ class App:
                 }
                 self.drawNewSong(songinfo=song_info)
 
-    def _secondIncrease(self):
-        while RUN:
-            sleep(1)
-            self.time_done = (datetime.datetime.combine(datetime.date.today(), self.time_done) + datetime.timedelta(seconds=1)).time()
+    # def _secondIncrease(self):
+    #     while RUN:
+    #         sleep(1.1) # To the human eye looks fine but doesnt roll back all the time with API updates 
+    #         self.time_done = (datetime.datetime.combine(datetime.date.today(), self.time_done) + datetime.timedelta(seconds=1)).time()
 
     def _updateSongBar(self):
         i = 0
@@ -214,8 +214,8 @@ f'''New song detected:
 
     def drawLoginPage(self):
         self.ClearWithBG()
-        logo = Image.open("res/imgs/spoti-logo.png")
-        logo.thumbnail((219,219))
+        #logo = Image.open("res/imgs/spoti-logo.png")
+        #logo.thumbnail((219,219))
         self.lock.acquire()
         self.comm.DisplayText("Please authorize this application to access your spotify data\nThere should be a new tab in your default browser", x=2, y=219+5,
                                 font="Roboto-Italic.ttf",
@@ -223,7 +223,7 @@ f'''New song detected:
                                 font_color=(255, 255, 255),
                                 background_color=BGCOL,
                                 align='left')
-        self.comm.DisplayPILImage(logo)
+        #self.comm.DisplayPILImage(logo)
         self.lock.release()
 
 def seconds_to_time(seconds):
@@ -246,7 +246,8 @@ def HandleAuth() -> spotipy.Spotify:
     # BRUH, I implemented a whole flask web server and it just had this builtin
     sp = spotipy.Spotify(oauth_manager=SpotifyPKCE(scope=OAUTH2_SCOPES))
     oauth: SpotifyPKCE = sp.oauth_manager
-    oauth.get_access_token()
+    print("If your browser did not open please navigate to:\n" + oauth.get_authorize_url())
+    oauth.get_access_token() 
     return sp
 
 if __name__ == "__main__":
@@ -276,8 +277,9 @@ if __name__ == "__main__":
     app.sp = SP
     app.ClearWithBG()
     threading.Thread(target=app._updateSongBar, daemon=True).start()
-    threading.Thread(target=app._secondIncrease).start() # keeping up with progress between API updates
+    #threading.Thread(target=app._secondIncrease).start() # keeping up with progress between API updates
     while RUN:
         pass
-
+    
+    lcd_comm.ScreenOff()
     lcd_comm.closeSerial()

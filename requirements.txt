@@ -1,14 +1,21 @@
 babel==2.16.0
-GPUtil==1.4.0
-numpy==2.1.2
+numpy~=1.24.4; python_version < "3.9"
+numpy~=1.26.4; python_version >= "3.9"
 pillow==10.4.0
 psutil==5.9.8
-pyadl==0.1
 pyserial==3.5
-pythonnet==3.0.4
-pywin32==306; sys_platform='win32'
 PyYAML==6.0.2
 spotipy==2.24.0
 uptime==3.0.1
 flask==3.0.3
 python-dotenv == 1.0.1
+
+# For Nvidia GPU on all platforms
+GPUtil~=1.4.0; python_version < "3.12"
+# GPUtil is broken for Python 3.12+ and not maintained anymore: fetch it from a fork where it is fixed
+GPUtil @ git+https://github.com/mathoudebine/gputil.git@1.4.0-py3.12 ; python_version >= "3.12"
+
+# Windows only
+pyadl==0.1; sys_platform=='win32'
+pythonnet==3.0.4; sys_platform=='win32'
+pywin32==306; sys_platform=='win32'

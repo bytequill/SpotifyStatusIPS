@@ -1,4 +1,6 @@
 **/__pycache__
+env/*
+venv/*
 .vscode
 .cache
 log.log
