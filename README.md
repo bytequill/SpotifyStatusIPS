@@ -17,7 +17,7 @@ Spotify display for screens compatible with https://github.com/mathoudebine/turi
 2. Create a spotify API application
     1. Goto `https://developer.spotify.com/dashboard/create` in your browser of choice
     2. Fill in `App name` and `App description` in any way you like
-    3. For `Redirect URIs` enter whatever is set as `SPOTIPY_REDIRECT_URI` in your `.env` or `.env.example` file (default is `http://localhost:9099/getToken`)
+    3. For `Redirect URIs` enter whatever is set as `SPOTIPY_REDIRECT_URI` in your `.env` or `.env.example` file (default is `http://127.0.0.1:9099/getToken`)
     4. You also need to mark `Web API` in the next section
     5. Click `Save` to create your app
     6. In the apps section click the `Settings` button
